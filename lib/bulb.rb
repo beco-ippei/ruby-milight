@@ -34,6 +34,23 @@ class Bulb
   def initialize(ip_address, port)
     @ipaddr = ip_address
     @port = port
+    @debugger = lambda {|_| }
+  end
+
+  def debugger=(type)
+    @debugger = case type
+                when :puts
+                  lambda {|msg|
+                    puts " - debug :: #{msg}"
+                  }
+                else
+                  lambda {|_| }
+                end
+    puts "set debug - #{type}"
+  end
+
+  def debug(msg)
+    @debugger.call msg
   end
 
   def on
@@ -47,6 +64,8 @@ class Bulb
   def bright(persent)
     if val = brightness(persent.to_i)
       command Bulb::Command::BRIGHTENESS, val
+    else
+      debug "invalid persent value '#{persent}'"
     end
   end
 
@@ -78,9 +97,15 @@ class Bulb
   end
 
   def command(cmd, value = '00')
+    debug "cmd : #{cmd} / #{value}"
     msg = message cmd, value
 
     sock = UDPSocket.open
+    sock.setsockopt(
+      Socket::SOL_SOCKET,
+      Socket::SO_BROADCAST,
+      1
+    )
     sock.send(msg, 0, @ipaddr, @port)
   end
 
