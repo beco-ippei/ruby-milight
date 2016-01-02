@@ -1,5 +1,10 @@
 # ruby-milight
-controller for milight or limitless-led (same product ?)
+controller ruby-api for milight or limitless-led
+(milight and limitless-led and easy-bulb is
+ same bridge-box controllable products)
+
+### API Document
+http://www.limitlessled.com/dev/
 
 
 # components
@@ -22,12 +27,13 @@ setup
 boot local-controller / env
 ---
 * load config
-  * bridge-box IP-Address
+  * get bridge-box network segment (24bit)
   * server url
 * bulb controller
   * lib/bulb.rb
   * and tests
   * sample app
+  * controll by groups
 
 ... writing.
 
