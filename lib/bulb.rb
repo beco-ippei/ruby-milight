@@ -9,11 +9,14 @@ class Bulb
     DISCO_SPEED_FASTER = '44'
 
     BRIGHTENESS = '4E'
+
+    WHITE = 'C2'
   end
 
   module Color
     VIOLET = '00'
     ROYAL_BLUE = '10'
+    BLUE = ROYAL_BLUE     # alias
     BABY_BLUE = '20'
     AQUA = '30'
     MINT = '40'
@@ -46,7 +49,7 @@ class Bulb
                 else
                   lambda {|_| }
                 end
-    puts "set debug - #{type}"
+    debug "set debug - #{type}"
   end
 
   def debug(msg)
@@ -61,25 +64,49 @@ class Bulb
     command Bulb::Command::LED_ALL_OFF
   end
 
-  def bright(persent)
-    if val = brightness(persent.to_i)
+  def white
+    command Bulb::Command::LED_ALL_ON
+    # white-command 100ms followed by 'on-command'
+    command Bulb::Command::WHITE
+  end
+
+  def color_value=(val)
+    if code = color_code(val)
+      command Bulb::Command::SET_COLOR, code
+    else
+      debug "invalid color value '#{val}'"
+    end
+  end
+
+  def brightness=(persent)
+    if val = brightness_code(persent.to_i)
       command Bulb::Command::BRIGHTENESS, val
     else
       debug "invalid persent value '#{persent}'"
     end
   end
 
+  def bright
+    self.brightness = 100
+  end
+
+  def dark
+    self.brightness = 0
+  end
+
+  private
+
   # for colors
   def method_missing(method, *args)
     color = defined_color method
     if color
       command Bulb::Command::SET_COLOR, color
+    else
+      raise "undefined method `#{method}'"
     end
   end
 
-  private
-
-  def brightness(persent)
+  def brightness_code(persent)
     return nil unless (0..100).cover?(persent)
     sprintf(
       '%02d',
@@ -91,6 +118,29 @@ class Bulb
     name = method.upcase.to_sym
     if Bulb::Color.constants.include? name
       Bulb::Color.const_get(name)
+    else
+      nil
+    end
+  end
+
+  # parse color code ("00" .. "ff")
+  # valid color-value is 0..255
+  def color_code(val)
+    unless [Fixnum, String].include? val.class
+      return nil
+    end
+
+    if val.kind_of? String
+      code = val
+      val = code.hex
+      val = -1 if val == 0 && code != '00'
+    else
+      val = val.to_i
+      code = '%02x' % val
+    end
+
+    if (0..255).cover? val
+      code
     else
       nil
     end

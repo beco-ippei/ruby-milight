@@ -6,7 +6,28 @@ class BulbTest < Test::Unit::TestCase
     @bulb = Bulb.new '127.0.0.1', 80
   end
 
-  def test_brightness
+  def test_color_code
+    [
+      [   0, '00'],
+      [  10, '0a'],
+      [  64, '40'],
+      [ 255, 'ff'],
+      ['a0', 'a0'],
+      ['10', '10'],
+    ].each do |(val, exp)|
+      code = @bulb.send :color_code, val
+      assert_equal code, exp
+    end
+  end
+
+  def test_invalid_color_code
+    [-1, 256, 10000, '', '0.', nil].each do |val|
+      code = @bulb.send :color_code, val
+      assert_nil code, "val is '#{val}'"
+    end
+  end
+
+  def test_brightness_code
     [
       [  0, '02'],
       [ 10, '04'],
@@ -15,8 +36,15 @@ class BulbTest < Test::Unit::TestCase
       [ 90, '24'],
       [100, '27'],
     ].each do |(arg, exp)|
-      val = @bulb.send :brightness, arg
+      val = @bulb.send :brightness_code, arg
       assert_equal val, exp
+    end
+  end
+
+  def test_invalid_brightness_code
+    [-1, 101, 'a'].each do |arg|
+      val = @bulb.send :brightness_code, arg
+      assert_nil val
     end
   end
 
@@ -24,6 +52,7 @@ class BulbTest < Test::Unit::TestCase
     {
       'violet': '00',
       'royal_blue': '10',
+      'blue': '10',
       'baby_blue': '20',
       'aqua': '30',
       'mint': '40',
@@ -43,8 +72,10 @@ class BulbTest < Test::Unit::TestCase
       color = @bulb.send :defined_color, method
       assert_equal color, exp
     end
+  end
 
-    %w[blue black gray].each do |method|
+  def test_not_defined_color
+    %w[hoge black gray].each do |method|
       color = @bulb.send :defined_color, method
       assert_nil color
     end
@@ -55,6 +86,7 @@ class BulbTest < Test::Unit::TestCase
     [
       ['41', '00', "A\x00U"],
       ['4E', 'A0', "N\xA0U"],
+      ['C2', '00', "\xC2\x00U"],
     ].each do |(cmd, val, exp)|
       msg = @bulb.send :message, cmd, val
       exp = exp.force_encoding('ascii-8bit')
