@@ -126,17 +126,16 @@ class Bulb
   # parse color code ("00" .. "ff")
   # valid color-value is 0..255
   def color_code(val)
-    unless [Fixnum, String].include? val.class
-      return nil
-    end
-
-    if val.kind_of? String
+    case val.class
+    when String
       code = val
       val = code.hex
       val = -1 if val == 0 && code != '00'
-    else
+    when Fixnum
       val = val.to_i
       code = '%02x' % val
+    else
+      return nil
     end
 
     if (0..255).cover? val
