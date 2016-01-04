@@ -10,6 +10,7 @@ class Bulb
 
     BRIGHTENESS = '4E'
 
+    NIGHT = 'C1'
     WHITE = 'C2'
   end
 
@@ -68,6 +69,12 @@ class Bulb
     command Bulb::Command::LED_ALL_ON
     # white-command 100ms followed by 'on-command'
     command Bulb::Command::WHITE
+  end
+
+  def night
+    command Bulb::Command::LED_ALL_OFF
+    # night-command 100ms followed by 'off-command'
+    command Bulb::Command::NIGHT
   end
 
   def color_value=(val)
