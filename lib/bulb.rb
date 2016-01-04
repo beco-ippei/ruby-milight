@@ -85,20 +85,20 @@ class Bulb
     end
   end
 
-  def brightness=(persent)
-    if val = brightness_code(persent.to_i)
+  def bright(persent)
+    if val = brightness(persent.to_i)
       command Bulb::Command::BRIGHTENESS, val
     else
       debug "invalid persent value '#{persent}'"
     end
   end
 
-  def bright
-    self.brightness = 100
+  def full_bright
+    self.bright 50
   end
 
   def dark
-    self.brightness = 0
+    self.bright 0
   end
 
   private
@@ -113,7 +113,7 @@ class Bulb
     end
   end
 
-  def brightness_code(persent)
+  def brightness(persent)
     return nil unless (0..100).cover?(persent)
     sprintf(
       '%02d',
