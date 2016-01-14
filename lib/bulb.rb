@@ -5,8 +5,10 @@ class Bulb
     SET_COLOR = '40'
     LED_ALL_OFF = '41'
     LED_ALL_ON = '42'
+
     DISCO_SPEED_SLOWER = '43'
     DISCO_SPEED_FASTER = '44'
+    DISCO_MODE = '4D'
 
     BRIGHTENESS = '4E'
 
@@ -59,6 +61,10 @@ class Bulb
 
   def on
     command Bulb::Command::LED_ALL_ON
+  end
+
+  def disco
+    command Bulb::Command::DISCO_MODE
   end
 
   def off
