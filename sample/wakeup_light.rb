@@ -24,7 +24,7 @@ end
   [:white],
   [[:bright, 30]],
   [:full_bright],
-  [:dark],
+  [:disco],
 ].each do |commands|
   commands.each do |cmd|
     bulb.send(*cmd)
@@ -32,4 +32,9 @@ end
   end
   sleep interval
 end
+
+sleep 10 * 60   # 10min
+bulb.dark
+sleep 2
+bulb.off
 
