@@ -1,10 +1,12 @@
-require "#{File.dirname(File.absolute_path __FILE__)}/../lib/bulb"
+$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+
+require 'milight'
 
 ipaddr = ENV['IPADDR']
 port = (ENV['PORT'] || 8899).to_i
 interval = 3 * 60     # 3min
 
-bulb = Bulb.new ipaddr, port
+bulb = Milight::Bulb.new ipaddr, port
 
 if ARGV[0] == 'prepare'
   puts 'prepare for wakeup-light'

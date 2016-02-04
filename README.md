@@ -1,10 +1,29 @@
-# ruby-milight
+# Milight
+
+ruby-milight project
+
 controller ruby-api for milight or limitless-led
 (milight and limitless-led and easy-bulb is
  same bridge-box controllable products)
 
-### API Document
+## API Document
 http://www.limitlessled.com/dev/
+
+## Installation
+
+Add this line to your application's Gemfile:
+
+```ruby
+gem 'ruby-milight'
+```
+
+And then execute:
+
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install ruby-milight
 
 
 # components
