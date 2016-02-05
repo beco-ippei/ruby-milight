@@ -1,9 +1,8 @@
-require 'test/unit'
-require './lib/bulb'
+require 'test_helper'
 
-class BulbTest < Test::Unit::TestCase
+class Milight::BulbTest < Minitest::Test
   def setup
-    @bulb = Bulb.new '127.0.0.1', 80
+    @bulb = ::Milight::Bulb.new '127.0.0.1', 80
   end
 
   def test_color_code
@@ -16,18 +15,18 @@ class BulbTest < Test::Unit::TestCase
       ['10', '10'],
     ].each do |(val, exp)|
       code = @bulb.send :color_code, val
-      assert_equal code, exp
+      assert_equal exp, code, "when val is [#{val}]"
     end
   end
 
   def test_invalid_color_code
     [-1, 256, 10000, '', '0.', nil].each do |val|
       code = @bulb.send :color_code, val
-      assert_nil code, "val is '#{val}'"
+      assert_nil code, "when val is '#{val}'"
     end
   end
 
-  def test_brightness_code
+  def test_brightness
     [
       [  0, '02'],
       [ 10, '04'],
@@ -36,14 +35,14 @@ class BulbTest < Test::Unit::TestCase
       [ 90, '24'],
       [100, '27'],
     ].each do |(arg, exp)|
-      val = @bulb.send :brightness_code, arg
+      val = @bulb.send :brightness, arg
       assert_equal val, exp
     end
   end
 
-  def test_invalid_brightness_code
+  def test_invalid_brightness
     [-1, 101, 'a'].each do |arg|
-      val = @bulb.send :brightness_code, arg
+      val = @bulb.send :brightness, arg
       assert_nil val
     end
   end

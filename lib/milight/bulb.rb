@@ -140,12 +140,12 @@ module Milight
     # parse color code ("00" .. "ff")
     # valid color-value is 0..255
     def color_code(val)
-      case val.class
-      when String
+      if val.is_a? String
         code = val
         val = code.hex
         val = -1 if val == 0 && code != '00'
-      when Fixnum
+      elsif val.is_a? Fixnum
+        code = val
         val = val.to_i
         code = '%02x' % val
       else
