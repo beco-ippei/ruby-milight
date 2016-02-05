@@ -1,6 +1,9 @@
 # Milight
 
-ruby-milight project
+[![Build Status](https://travis-ci.org/beco-ippei/ruby-milight.svg?branch=master)](https://travis-ci.org/beco-ippei/ruby-milight)
+[![Coverage Status](https://coveralls.io/repos/github/beco-ippei/ruby-milight/badge.svg?branch=add_ci_settings)](https://coveralls.io/github/beco-ippei/ruby-milight?branch=add_ci_settings)
+
+A ruby wrapper project for milight api.
 
 controller ruby-api for milight or limitless-led
 (milight and limitless-led and easy-bulb is
@@ -14,7 +17,7 @@ http://www.limitlessled.com/dev/
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'ruby-milight'
+gem 'milight'
 ```
 
 And then execute:
@@ -23,12 +26,12 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install ruby-milight
+    $ gem install milight
 
 
 # components
 * local controller (working on LAN)
-* gateway server (working on Internet)
+* [may be not] gateway server (working on Internet)
 
 components messaging each other.
 use web-socket ??
@@ -40,7 +43,7 @@ setup
 ---
 * ?) connect bridge-box and setup wifi config
   or configure by Appli
-* get bridge-box IP-Address (from LAN)
+* ~~get bridge-box IP-Address (from LAN)~~
 * configure this app (make or overwrite config file ?)
 
 boot local-controller / env
