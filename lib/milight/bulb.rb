@@ -32,7 +32,6 @@ module Milight
       ORANGE = 'a0'
       RED = 'b0'
       PINK = 'c0'
-      WHITE = 'c2'
       FUSIA = 'd0'
       LILAC = 'e0'
       LAVENDAR = 'f0'
@@ -84,6 +83,15 @@ module Milight
       command Command::NIGHT
     end
 
+    # for colors
+    Color.constants.each do |color|
+      color_name = color.downcase
+      define_method color_name.to_sym do
+        color_code = defined_color color
+        command Command::SET_COLOR, color_code
+      end
+    end
+
     def color_value=(val)
       if code = color_code(val)
         command Command::SET_COLOR, code
@@ -109,16 +117,6 @@ module Milight
     end
 
     private
-
-    # for colors
-    def method_missing(method, *args)
-      color = defined_color method
-      if color
-        command Command::SET_COLOR, color
-      else
-        raise "undefined method `#{method}'"
-      end
-    end
 
     def brightness(persent)
       return nil unless (0..100).cover?(persent)
@@ -163,6 +161,7 @@ module Milight
       debug "cmd : #{cmd} / #{value}"
       msg = message cmd, value
 
+      #TODO: initialize first ?
       sock = UDPSocket.open
       sock.setsockopt(
         Socket::SOL_SOCKET,
