@@ -2,27 +2,13 @@ require 'socket'
 
 module Milight
   class Bulb
-    module Command
-      SET_COLOR = '40'
-      LED_ALL_OFF = '41'
-      LED_ALL_ON = '42'
-
-      DISCO_SPEED_SLOWER = '43'
-      DISCO_SPEED_FASTER = '44'
-      DISCO_MODE = '4D'
-
-      BRIGHTENESS = '4E'
-
-      NIGHT = 'C1'
-      WHITE = 'C2'
-    end
-
     def initialize(ip_address, port)
       @ipaddr = ip_address
       @port = port
       @debugger = lambda {|_| }
     end
 
+    #TODO: move to anywhere...
     def debugger=(type)
       @debugger = case type
                   when :puts
@@ -64,7 +50,7 @@ module Milight
     end
 
     # for colors
-    Milight::Color.constants.each do |color|
+    Color.constants.each do |color|
       color_name = color.downcase
       define_method color_name.to_sym do
         color_code = defined_color color
@@ -108,8 +94,8 @@ module Milight
 
     def defined_color(method)
       name = method.upcase.to_sym
-      if Milight::Color.constants.include? name
-        Milight::Color.const_get(name)
+      if Color.constants.include? name
+        Color.const_get(name)
       else
         nil
       end
