@@ -63,7 +63,6 @@ class Milight::BulbTest < Minitest::Test
       'orange': 'a0',
       'red': 'b0',
       'pink': 'c0',
-      'white': 'c2',
       'fusia': 'd0',
       'lilac': 'e0',
       'lavendar': 'f0',
