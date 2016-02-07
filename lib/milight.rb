@@ -1,6 +1,4 @@
 require "milight/version"
+require "milight/color"
 require "milight/bulb"
-
-module Milight
-end
 

@@ -17,7 +17,7 @@ when 'off'
 when 'color'
   bulb.send val.to_sym
 when 'color-list'
-  puts Milight::Bulb::Color.constants
+  puts Milight::Color.constants
     .map(&:downcase).join ', '
 when 'bright'
   bulb.brightness = val.to_i

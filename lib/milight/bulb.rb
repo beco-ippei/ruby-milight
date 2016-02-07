@@ -17,26 +17,6 @@ module Milight
       WHITE = 'C2'
     end
 
-    module Color
-      VIOLET = '00'
-      ROYAL_BLUE = '10'
-      BLUE = ROYAL_BLUE     # alias
-      BABY_BLUE = '20'
-      AQUA = '30'
-      MINT = '40'
-      SEAFOAM_GREEN = '50'
-      GREEN = '60'
-      LIME_GREEN = '70'
-      YELLOW = '80'
-      YELLOW_ORANGE = '90'
-      ORANGE = 'a0'
-      RED = 'b0'
-      PINK = 'c0'
-      FUSIA = 'd0'
-      LILAC = 'e0'
-      LAVENDAR = 'f0'
-    end
-
     def initialize(ip_address, port)
       @ipaddr = ip_address
       @port = port
@@ -84,7 +64,7 @@ module Milight
     end
 
     # for colors
-    Color.constants.each do |color|
+    Milight::Color.constants.each do |color|
       color_name = color.downcase
       define_method color_name.to_sym do
         color_code = defined_color color
@@ -128,8 +108,8 @@ module Milight
 
     def defined_color(method)
       name = method.upcase.to_sym
-      if Color.constants.include? name
-        Color.const_get(name)
+      if Milight::Color.constants.include? name
+        Milight::Color.const_get(name)
       else
         nil
       end
