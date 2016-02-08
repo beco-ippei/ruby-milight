@@ -32,8 +32,17 @@ module Milight
       command Command::LED_ON[@group]
     end
 
-    def disco
-      command Command::DISCO_MODE
+    def disco(attr = nil)
+      case attr && attr.to_sym
+      when nil
+        command Command::DISCO_MODE
+      when :faster, :fast
+        command Command::DISCO_SPEED_FASTER
+      when :slower, :slow
+        command Command::DISCO_SPEED_SLOWER
+      else
+        debug "invalid disco attribute: '#{attr}'"
+      end
     end
 
     def off
@@ -109,11 +118,12 @@ module Milight
     end
 
     def brightness(persent)
-      return nil unless (0..100).cover?(persent)
-      sprintf(
-        '%02d',
-        2 + 25 * persent.to_i / 100
-      )
+      if (0..100).cover? persent
+        sprintf(
+          '%02d',
+          2 + 25 * persent.to_i / 100
+        )
+      end
     end
 
     def defined_color(method)
