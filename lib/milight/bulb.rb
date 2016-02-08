@@ -2,9 +2,12 @@ require 'socket'
 
 module Milight
   class Bulb
-    def initialize(ip_address, port)
-      @ipaddr = ip_address
+    def initialize(ip: nil, port: 8899, group: :all)
+      raise "ip is not allowed nil" unless ip
+      @ipaddr = ip
       @port = port
+      @group = group
+
       @debugger = lambda {|_| }
     end
 
@@ -26,7 +29,7 @@ module Milight
     end
 
     def on
-      command Command::LED_ALL_ON
+      command Command::LED_ON[@group]
     end
 
     def disco
@@ -34,19 +37,19 @@ module Milight
     end
 
     def off
-      command Command::LED_ALL_OFF
+      command Command::LED_OFF[@group]
     end
 
     def white
-      command Command::LED_ALL_ON
+      self.on
       # white-command 100ms followed by 'on-command'
-      command Command::WHITE
+      command Command::WHITE[@group]
     end
 
     def night
-      command Command::LED_ALL_OFF
+      self.off
       # night-command 100ms followed by 'off-command'
-      command Command::NIGHT
+      command Command::NIGHT[@group]
     end
 
     # for colors
@@ -54,12 +57,14 @@ module Milight
       color_name = color.downcase
       define_method color_name.to_sym do
         color_code = defined_color color
+        self.on
         command Command::SET_COLOR, color_code
       end
     end
 
     def color_value=(val)
       if code = color_code(val)
+        self.on
         command Command::SET_COLOR, code
       else
         debug "invalid color value '#{val}'"
@@ -68,6 +73,7 @@ module Milight
 
     def bright(persent)
       if val = brightness(persent.to_i)
+        self.on
         command Command::BRIGHTENESS, val
       else
         debug "invalid persent value '#{persent}'"

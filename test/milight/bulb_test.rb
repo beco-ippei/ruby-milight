@@ -2,7 +2,11 @@ require 'test_helper'
 
 class Milight::BulbTest < Minitest::Test
   def setup
-    @bulb = ::Milight::Bulb.new '127.0.0.1', 80
+    @bulb = ::Milight::Bulb.new ip: '127.0.0.1'
+  end
+
+  def test_initialize_ip_is_nil
+    #TODO: impl
   end
 
   def test_color_code
