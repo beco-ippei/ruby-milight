@@ -1,12 +1,12 @@
 require 'socket'
+require 'ipaddr'
 
 module Milight
   class Bulb
-    def initialize(ip: nil, port: 8899, group: :all)
-      raise "ip is not allowed nil" unless ip
-      @ipaddr = ip
+    def initialize(group: :all, ip: nil, port: 8899)
+      self.group = group
+      self.ip = ip
       @port = port
-      @group = group
 
       @debugger = lambda {|_| }
     end
@@ -40,15 +40,15 @@ module Milight
       command Command::LED_OFF[@group]
     end
 
+    # white-command 100ms followed by 'on-command'
     def white
       self.on
-      # white-command 100ms followed by 'on-command'
       command Command::WHITE[@group]
     end
 
+    # night-command 100ms followed by 'off-command'
     def night
       self.off
-      # night-command 100ms followed by 'off-command'
       command Command::NIGHT[@group]
     end
 
@@ -89,6 +89,24 @@ module Milight
     end
 
     private
+
+    def ip=(ipaddr)
+      unless ipaddr
+        raise "ip is not allowed nil"
+      end
+      IPAddr.new ipaddr   # just validate
+      @ipaddr = ipaddr
+    end
+
+    def group=(group)
+      if group == :all
+        @group = :all
+      elsif (1..5).cover? group
+        @group = "group#{group}".to_sym
+      else
+        raise 'invalid group. use :all or 1..5'
+      end
+    end
 
     def brightness(persent)
       return nil unless (0..100).cover?(persent)

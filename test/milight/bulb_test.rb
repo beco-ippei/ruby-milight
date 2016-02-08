@@ -1,5 +1,6 @@
 require 'test_helper'
 
+#TODO: spec style
 class Milight::BulbTest < Minitest::Test
   def setup
     @bulb = ::Milight::Bulb.new ip: '127.0.0.1'

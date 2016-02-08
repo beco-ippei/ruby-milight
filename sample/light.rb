@@ -3,8 +3,9 @@ $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'milight'
 
 ipaddr = ENV['IPADDR']
-port = (ENV['PORT'] || 8899).to_i
-bulb = Milight::Bulb.new ipaddr, port
+
+group = (g = ARGV.shift) == 'all' ? :all : g.to_i
+bulb = Milight::Bulb.new ip: ipaddr, group: group
 
 cmd = ARGV.shift
 val = ARGV.shift
