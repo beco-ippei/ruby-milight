@@ -20,6 +20,8 @@ when 'color'
 when 'color-list'
   puts Milight::Color.constants
     .map(&:downcase).join ', '
+when 'dark'
+  bulb.dark
 when 'bright'
   bulb.bright val.to_i
 when 'night'
