@@ -45,6 +45,37 @@ class Milight::BulbTest < Minitest::Test
     end
   end
 
+  def test_ip=
+    @bulb.send :ip=, '127.0.0.1'
+    actual = @bulb.instance_variable_get :@ipaddr
+    assert_equal '127.0.0.1', actual
+
+    assert_raises StandardError do
+      @bulb.send :ip=, nil
+    end
+  end
+
+  def test_group=
+    [
+      [:all, :all],
+      [1, :group1],
+      [2, :group2],
+      [3, :group3],
+      [4, :group4],
+      [5, :group5],
+    ].each do |(val, exp)|
+      @bulb.send :group=, val
+      actual = @bulb.instance_variable_get :@group
+      assert_equal exp, actual
+    end
+
+    [0, 6, nil, :aa, 'all'].each do |val|
+      assert_raises StandardError do
+        @bulb.send :group=, val
+      end
+    end
+  end
+
   def test_invalid_brightness
     [-1, 101, 'a'].each do |arg|
       val = @bulb.send :brightness, arg
