@@ -1,0 +1,139 @@
+#!/usr/bin/env ruby
+
+def current_ipaddr
+  wlan_conf = %x[LANG=C ifconfig wlan]
+  matched = /inet\ addr:([0-9\.]*)/.match(wlan_conf)
+  if matched
+    matched[1]
+  end
+end
+
+MILIGHT_WIFI = /^10\.10\.100\.[0-9]+$/
+def wait_connection(milight = true)
+  20.times do
+    sleep 3
+    if ipaddr = current_ipaddr
+      print '.'
+    else
+      print '-'
+    end
+    if ipaddr && (MILIGHT_WIFI =~ ipaddr).nil? != milight
+      return true
+    end
+  end
+  false
+end
+
+if wait_connection true
+  puts '... miligt connected.'
+else
+  puts ' milight wifi connection timeout (1min)'
+  exit 1
+end
+
+require "socket"
+SERVER_IP = '10.10.100.254'
+PORT = '48899'
+
+sock = UDPSocket.open
+sock.setsockopt(
+  Socket::SOL_SOCKET,
+  Socket::SO_BROADCAST,
+  1
+)
+def sock.command msg
+  self.send msg, 0, SERVER_IP, PORT
+end
+
+
+RECEIVE_IP = "0.0.0.0"
+
+t1 = Thread.new do
+  puts '-- receive response: WSCAN ....'
+  rsock = UDPSocket.new
+  rsock.bind(RECEIVE_IP, PORT)
+  string = nil
+
+  sel = IO::select([rsock])
+  if sel != nil
+    sel[0].each do |s|
+      data     = s.recvfrom_nonblock(65535)
+      string   = data[0].chomp!
+    end
+  else
+    puts '-- not received ....'
+    exit 1
+  end
+  rsock.close
+  string.gsub(/\+ok=\n/, '')
+end
+
+sleep 1
+puts '-- send command: WSCAN ....'
+sock.command "Link_Wi-Fi"
+sock.command "+ok"
+sock.command "AT+WSCAN\r"
+
+t1.join
+
+require 'csv'
+wlans = t1.value.split "\n"
+
+wlans.shift
+ssids = wlans.map do |line|
+  ch, ssid, _, sec, _ = line.split(',')
+  if ssid.is_a?(String) && ssid.length > 1
+    {ch: ch, ssid: ssid, sec: sec}
+  end
+end.compact
+
+def choice_ssid ssids
+  puts '---------------------------------'
+  ssids.each.with_index do |s, idx|
+    puts "[#{idx+1}]: '#{s[:ssid]}' (#{s[:sec]})"
+  end
+  puts '---------------------------------'
+
+  while true
+    print '>> Choise your SSID(no) > '
+    num = gets.chomp.to_i
+    if num == 0
+      next      # 0 or nil (not a number)
+    elsif !(1..ssids.size).cover? num
+      exit 0
+    end
+    return ssids[num-1]
+  end
+end
+
+ssid = choice_ssid ssids
+sock.command "AT+WSSSID=#{ssid[:ssid]}\r"
+
+def security_key
+  while true
+    print '>> Input security key > '
+    key = gets.chomp
+    if key != ""
+      return key
+    end
+  end
+end
+
+key = security_key
+sock.command "AT+WSKEY=WPA2PSK,AES,#{key}\r"
+
+sock.command "AT+WMODE=STA\r"
+sock.command "AT+Z\r"
+sock.command "AT+Q\r"
+
+sock.close
+
+
+if wait_connection false
+  puts '... miligt wifi disconnected.'
+  puts 'check your controller box led!'
+else
+  puts ' milight wifi connection still connected'
+  exit 1
+end
+
