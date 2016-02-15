@@ -1,17 +1,13 @@
 module Milight
   module Util
     def self.current_ipaddr
-      matched = /inet\ addr:([0-9\.]*)/.match(wlan_config)
-      if matched
-        matched[1]
-      end
+      matched = /inet\ addr:([0-9\.]*)/.match wlan_config
+      matched[1] if matched
     end
 
     def self.broadcast_addr
-      matched = /Bcast:([0-9\.]*)/.match(wlan_config)
-      if matched
-        matched[1]
-      end
+      matched = /Bcast:([0-9\.]*)/.match wlan_config
+      matched[1] if matched
     end
 
     private

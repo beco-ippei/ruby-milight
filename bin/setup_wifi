@@ -1,18 +1,14 @@
 #!/usr/bin/env ruby
+$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
-def current_ipaddr
-  wlan_conf = %x[LANG=C ifconfig wlan]
-  matched = /inet\ addr:([0-9\.]*)/.match(wlan_conf)
-  if matched
-    matched[1]
-  end
-end
+require 'milight'
+require 'readline'
 
 MILIGHT_WIFI = /^10\.10\.100\.[0-9]+$/
 def wait_connection(milight = true)
   20.times do
     sleep 3
-    if ipaddr = current_ipaddr
+    if ipaddr = Milight::Util.current_ipaddr
       print '.'
     else
       print '-'
@@ -24,10 +20,15 @@ def wait_connection(milight = true)
   false
 end
 
+puts "-- Please connect wifi 'milight_XXXXXXX'."
+
 if wait_connection true
-  puts '... miligt connected.'
+  puts '... milight connected.'
 else
-  puts ' milight wifi connection timeout (1min)'
+  puts <<DESC
+  milight wifi connection timeout (1min)
+  if milight wifi not found, initialize your controller box.
+DESC
   exit 1
 end
 
@@ -49,7 +50,7 @@ end
 RECEIVE_IP = "0.0.0.0"
 
 t1 = Thread.new do
-  puts '-- receive response: WSCAN ....'
+  puts '-- waiting receive response: WSCAN ....'
   rsock = UDPSocket.new
   rsock.bind(RECEIVE_IP, PORT)
   string = nil
@@ -57,8 +58,8 @@ t1 = Thread.new do
   sel = IO::select([rsock])
   if sel != nil
     sel[0].each do |s|
-      data     = s.recvfrom_nonblock(65535)
-      string   = data[0].chomp!
+      data = s.recvfrom_nonblock(65535)
+      string = data[0].chomp!
     end
   else
     puts '-- not received ....'
@@ -76,30 +77,36 @@ sock.command "AT+WSCAN\r"
 
 t1.join
 
-require 'csv'
+#require 'csv'
 wlans = t1.value.split "\n"
 
-wlans.shift
+wlans.shift   # ignore header
 ssids = wlans.map do |line|
-  ch, ssid, _, sec, _ = line.split(',')
+  ch, ssid, _, sec, _ = line.split ','
   if ssid.is_a?(String) && ssid.length > 1
     {ch: ch, ssid: ssid, sec: sec}
   end
 end.compact
 
 def choice_ssid ssids
-  puts '---------------------------------'
+  puts '', '-'*20
+  puts " no: 'ssid' (security types)"
   ssids.each.with_index do |s, idx|
-    puts "[#{idx+1}]: '#{s[:ssid]}' (#{s[:sec]})"
+    num = '%#2d' % (idx+1)
+    puts " #{num}: '#{s[:ssid]}' (#{s[:sec]})"
   end
-  puts '---------------------------------'
+  puts '-'*20, ''
 
   while true
-    print '>> Choise your SSID(no) > '
-    num = gets.chomp.to_i
+    msg = '>> Choise your SSID(no) > '
+    num = Readline.readline(msg).chomp.to_i
     if num == 0
       next      # 0 or nil (not a number)
     elsif !(1..ssids.size).cover? num
+      puts <<-MSG
+        invalid number : '#{num}'
+        exit.
+      MSG
       exit 0
     end
     return ssids[num-1]
@@ -107,12 +114,13 @@ def choice_ssid ssids
 end
 
 ssid = choice_ssid ssids
+puts "-- set wifi SSID : '#{ssid[:ssid]}'"
 sock.command "AT+WSSSID=#{ssid[:ssid]}\r"
 
 def security_key
   while true
-    print '>> Input security key > '
-    key = gets.chomp
+    msg = '>> Input security key > '
+    key = Readline.readline(msg).chomp
     if key != ""
       return key
     end
@@ -120,6 +128,7 @@ def security_key
 end
 
 key = security_key
+puts "-- set wifi security key : '#{key}'"
 sock.command "AT+WSKEY=WPA2PSK,AES,#{key}\r"
 
 sock.command "AT+WMODE=STA\r"
@@ -130,8 +139,11 @@ sock.close
 
 
 if wait_connection false
-  puts '... miligt wifi disconnected.'
-  puts 'check your controller box led!'
+  puts <<DESC
+  ... miligt wifi disconnected.
+  check your controller box led!
+
+DESC
 else
   puts ' milight wifi connection still connected'
   exit 1
