@@ -133,9 +133,13 @@ DESC
       puts " #{num}: '#{s[:ssid]}' (#{s[:sec]})"
     end
     puts '-'*20, ''
+    puts <<-DESC
+      Choise your SSID(no).
+      but if your Access point not found, restart app
+    DESC
 
     while true
-      msg = '>> Choise your SSID(no) > '
+      msg = ">> input your SSID no(1-#{ssids.size-1}) > "
       num = Readline.readline(msg).chomp.to_i
       if num == 0
         next      # 0 or nil (not a number)
