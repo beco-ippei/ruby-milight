@@ -1,7 +1,7 @@
 # Milight
 
 [![Build Status](https://travis-ci.org/beco-ippei/ruby-milight.svg?branch=master)](https://travis-ci.org/beco-ippei/ruby-milight)
-[![Coverage Status](https://coveralls.io/repos/github/beco-ippei/ruby-milight/badge.svg?branch=add_ci_settings)](https://coveralls.io/github/beco-ippei/ruby-milight?branch=add_ci_settings)
+[![Coverage Status](https://coveralls.io/repos/github/beco-ippei/ruby-milight/badge.svg)](https://coveralls.io/github/beco-ippei/ruby-milight)
 
 A ruby wrapper project for milight api.
 
