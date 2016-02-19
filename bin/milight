@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+
+$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+
+SETUP = %w[setup]
+CONSOLE = %w[console c]
+all_cmd = SETUP + CONSOLE
+
+cmd = ARGV[0]
+unless cmd
+  puts <<-DESC
+    sub-command must set
+    valid commands are #{all_cmd.join ','}
+  DESC
+  exit
+end
+
+require 'milight'
+
+#TODO add group to bulb
+case cmd.downcase.to_sym
+when :setup
+  require 'milight/bridge_box'
+  Milight::BridgeBox.setup
+
+when :console, :c
+  require "irb"
+  IRB.start
+
+else
+  puts <<-DESC
+    sub-command '#{cmd}' is invalid.
+    valid commands are #{all_cmd.join ','}
+  DESC
+end
+
