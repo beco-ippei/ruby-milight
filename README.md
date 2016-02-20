@@ -30,32 +30,42 @@ Or install it yourself as:
 
 
 # components
-* local controller (working on LAN)
-* [may be not] gateway server (working on Internet)
-
-components messaging each other.
-use web-socket ??
+* led-bulb controller class
+  `lib/milight/bulb.rb`
+* bridge-box wifi setup command
+  `bin/milight setup`
+* TODO: console tool
+  `bin/milight console`
+* TODO: add to group tool
+  `bin/milight group_add [1-4]`
 
 ---
 
 # TODO
-setup
----
-* ?) connect bridge-box and setup wifi config
-  or configure by Appli
-* ~~get bridge-box IP-Address (from LAN)~~
-* configure this app (make or overwrite config file ?)
 
-boot local-controller / env
+usage
 ---
-* load config
-  * get bridge-box network segment (24bit)
-  * server url
-* bulb controller
-  * lib/bulb.rb
-  * and tests
-  * sample app
-  * controll by groups
+* use gem
+* how to setup
+* add bulb to group (init bulbs)
 
-... writing.
+localize
+---
+* English ....
+* 日本語/japanese (?)
+
+bulb module
+---
+* disco modes
+* support "double white" bulb
+
+tools
+---
+* console tool (like 'bin/console')
+* add to group tool
+
+tests
+---
+* test messasing
+* other
 
